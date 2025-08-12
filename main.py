@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.db import init_db
 from app.routers import events
@@ -12,12 +13,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
+    yield
+
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+app = FastAPI(lifespan=lifespan)
 app.include_router(events.router, prefix="/v1")
