@@ -1,13 +1,27 @@
+from typing import Iterable, List
 from sqlmodel import Session
-from .models import Events
-from .repository import EventsRepository
+from .models import Event
+from .schemas import EventIn
 
-class EventsService:
-    def __init__(self, session: Session):
-        self.repo = EventsRepository(session)
+class EventService:
+    def __init__(self, session: Session) -> None:
+        self.session = session
 
-    def list_all(self):
-        return self.repo.list_all()
+    def create(self, data: EventIn) -> Event:
+        from .repository import EventRepository
+        repo = EventRepository(self.session)
+        ev = Event.model_validate(data)
+        return repo.add(ev)
 
-    def create(self, data: dict):
-        return self.repo.create(Events(**data))
+    def create_batch(self, items: Iterable[EventIn]) -> int:
+        from .repository import EventRepository
+        repo = EventRepository(self.session)
+        events = [Event.model_validate(i) for i in items]
+        return repo.add_many(events)
+
+    def list_with_total(self, offset: int, limit: int) -> tuple[list[Event], int]:
+        from .repository import EventRepository
+        repo = EventRepository(self.session)
+        items = list(repo.list(offset=offset, limit=limit))  
+        total = repo.count()
+        return items, total

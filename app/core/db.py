@@ -1,13 +1,16 @@
 # app/core/db.py
-from sqlmodel import create_engine
-from .config import settings
+from typing import Generator
+from sqlmodel import create_engine, Session
+import os
 
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://markus:1234@localhost:5432/dashboard_db")
 engine = create_engine(
-    settings.DATABASE_URL,
+    DATABASE_URL,  # type: ignore
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    echo=False,
 )
 
-def init_db():
-    pass  # Cambio: no crear tablas automáticamente
+
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
