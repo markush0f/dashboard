@@ -1,4 +1,3 @@
-# app/routers/events.py
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from app.core.db import get_session
