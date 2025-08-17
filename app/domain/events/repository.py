@@ -4,7 +4,7 @@ from sqlalchemy import func, select as sa_select
 from .models import Event
 from typing import Any, Sequence, cast
 from sqlalchemy import desc
-
+# Event Repository
 class EventRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
