@@ -9,7 +9,7 @@ class EventRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def add(self, ev: Event) -> Event:
+    def create(self, ev: Event) -> Event:
         self.session.add(ev)
         self.session.commit()
         self.session.refresh(ev)

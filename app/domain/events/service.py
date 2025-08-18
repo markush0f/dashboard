@@ -11,7 +11,7 @@ class EventService:
         from .repository import EventRepository
         repo = EventRepository(self.session)
         ev = Event.model_validate(data)
-        return repo.add(ev)
+        return repo.create(ev)
 
     def create_batch(self, items: Iterable[EventIn]) -> int:
         from .repository import EventRepository

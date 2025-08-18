@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import events  
+from app.routers.users import router as users_router
 
 app = FastAPI(
     title="Dashboard API",
@@ -22,3 +23,4 @@ def health():
     return {"status": "ok"}
 
 app.include_router(events.router)
+app.include_router(users_router)
