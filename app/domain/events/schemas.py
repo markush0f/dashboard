@@ -1,10 +1,10 @@
-# app/domain/events/schemas.py
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, List
 from sqlmodel import SQLModel
 
 class EventIn(SQLModel):
+    user_id: int
     ts: datetime
     url: str
     title: Optional[str] = None
