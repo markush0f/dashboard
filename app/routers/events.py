@@ -16,8 +16,7 @@ def list_events(
     svc: EventService = Depends(get_event_service),
 ):
     items, total = svc.list_with_total(offset=offset, limit=limit)
-    # Pydantic/SQLModel hará la conversión Event -> EventOut automáticamente
-    return EventPage(total=total, items=items)
+    return EventPage(total=total, items=items)  # type: ignore
 
 @router.post("", response_model=EventOut)
 def create_event(payload: EventIn, svc: EventService = Depends(get_event_service)):

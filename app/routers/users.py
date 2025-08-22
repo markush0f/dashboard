@@ -12,7 +12,7 @@ def get_service(session: Session = Depends(get_session)) -> UsersService:
 @router.get("", response_model=UsersPage)
 def list_users(offset: int = 0, limit: int = 50, svc: UsersService = Depends(get_service)):
     items, total = svc.list_with_total(offset=offset, limit=limit)
-    return UsersPage(total=total, items=items)  # SQLModel convierte a DTO
+    return UsersPage(total=total, items=items)  # type: ignore
 
 @router.post("", response_model=UsersRead)
 def create_users(payload: UsersCreate, svc: UsersService = Depends(get_service)):

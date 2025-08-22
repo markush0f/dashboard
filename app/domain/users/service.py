@@ -10,7 +10,7 @@ class UsersService:
 
     def list_with_total(self, offset: int, limit: int) -> tuple[list[User], int]:
         items_seq = self.repo.list(offset=offset, limit=limit)
-        items: List[User] = list(items_seq)  # normaliza a list para evitar warnings de tipos
+        items: List[User] = list(items_seq)  # normaliza a list para evitar warnings de tipos   
         total = self.repo.count()
         return items, total
 

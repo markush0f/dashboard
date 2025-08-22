@@ -8,10 +8,11 @@ import os, sys
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(BASE_DIR)
 
-from app.core.config import settings
+from app.core.config import get_settings
 from app.domain.events import models as events_models
-from app.domain.goals import models as goals_models
+from app.domain.users import models as users_models
 
+settings = get_settings()
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)  # Cambio
 
