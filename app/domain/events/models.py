@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, relationship
 from app.domain.users.models import User
 
 class Event(SQLModel, table=True):
-    __tablename__ = "event"
+    __tablename__ = "event" #type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
