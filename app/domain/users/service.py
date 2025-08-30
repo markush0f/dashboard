@@ -10,10 +10,10 @@ class UsersService:
 
     def list_with_total(self, offset: int, limit: int) -> tuple[list[User], int]:
         items_seq = self.repo.list(offset=offset, limit=limit)
-        items: List[User] = list(items_seq)  # normaliza a list para evitar warnings de tipos   
+        items: List[User] = list(items_seq) 
         total = self.repo.count()
         return items, total
 
     def create(self, data: UsersCreate) -> User:
-        obj = User.model_validate(data)
+        obj = User.model_validate(data.model_dump())
         return self.repo.create(obj)

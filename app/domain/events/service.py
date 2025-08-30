@@ -1,7 +1,9 @@
+from asyncio import events
 from typing import Iterable, List
 from sqlmodel import Session
 from .models import Event
 from .schemas import EventIn
+
 
 class EventService:
     def __init__(self, session: Session) -> None:
@@ -9,19 +11,22 @@ class EventService:
 
     def create(self, data: EventIn) -> Event:
         from .repository import EventRepository
+
         repo = EventRepository(self.session)
-        ev = Event.model_validate(data)
+        ev = Event.model_validate(data.model_dump())
         return repo.create(ev)
- 
+
     def create_batch(self, items: Iterable[EventIn]) -> int:
         from .repository import EventRepository
+
         repo = EventRepository(self.session)
-        events = [Event.model_validate(i) for i in items]
+        events = [Event.model_validate(i.model_dump()) for i in items]
         return repo.add_many(events)
 
     def list_with_total(self, offset: int, limit: int) -> tuple[list[Event], int]:
         from .repository import EventRepository
+
         repo = EventRepository(self.session)
-        items = list(repo.list(offset=offset, limit=limit))  
+        items = list(repo.list(offset=offset, limit=limit))
         total = repo.count()
         return items, total

@@ -3,6 +3,7 @@ from sqlmodel import Session
 from app.core.db import get_session
 from app.domain.events.service import EventService
 from app.domain.events.schemas import EventIn, EventOut, EventBatchIn, EventPage
+from fastapi import HTTPException
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -16,8 +17,9 @@ def list_events(
     svc: EventService = Depends(get_event_service),
 ):
     items, total = svc.list_with_total(offset=offset, limit=limit)
+    if total == 0:
+        raise HTTPException(status_code=404, detail="No events found")
     return EventPage(total=total, items=items)  # type: ignore
-
 @router.post("", response_model=EventOut)
 def create_event(payload: EventIn, svc: EventService = Depends(get_event_service)):
     return svc.create(payload)

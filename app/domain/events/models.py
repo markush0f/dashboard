@@ -1,11 +1,9 @@
-from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
+from datetime import datetime
 
 if TYPE_CHECKING:
     from app.domain.users.models import User
-
 
 class Event(SQLModel, table=True):
 
@@ -22,3 +20,13 @@ class Event(SQLModel, table=True):
     productive_score: float = Field(default=0.0)
 
     user: "User" = Relationship(back_populates="events")
+
+
+# https://sqlmodel.tiangolo.com/tutorial/relationship-attributes/define-relationships-attributes/#declare-relationship-attributes
+
+
+# {
+#   "email": "markus@example.com",
+#   "full_name": "Markus Abramian",
+#   "disabled": false
+# }
