@@ -82,7 +82,6 @@ repository_py = dedent(f"""\
 
         def count(self) -> int:
             stmt = select(func.count()).select_from({Pascal})
-            # tip-friendly con SQLModel
             return int(self.session.exec(stmt).one())
 
         def create(self, obj: {Pascal}) -> {Pascal}:
@@ -93,7 +92,7 @@ repository_py = dedent(f"""\
     """)
 
 service_py = dedent(f"""\
-    from typing import Tuple, List
+    from typing import List
     from sqlmodel import Session
     from .models import {Pascal}
     from .repository import {Pascal}Repository
@@ -105,12 +104,13 @@ service_py = dedent(f"""\
 
         def list_with_total(self, offset: int, limit: int) -> tuple[list[{Pascal}], int]:
             items_seq = self.repo.list(offset=offset, limit=limit)
-            items: List[{Pascal}] = list(items_seq)  # normaliza a list para evitar warnings de tipos
+            items: List[{Pascal}] = list(items_seq)
             total = self.repo.count()
             return items, total
 
         def create(self, data: {Pascal}Create) -> {Pascal}:
-            obj = {Pascal}.model_validate(data)
+            # CORREGIDO: convertir schema a dict
+            obj = {Pascal}.model_validate(data.model_dump())
             return self.repo.create(obj)
     """)
 
@@ -129,7 +129,7 @@ router_py = dedent(f"""\
     @router.get("", response_model={Pascal}Page)
     def list_{domain}(offset: int = 0, limit: int = 50, svc: {Pascal}Service = Depends(get_service)):
         items, total = svc.list_with_total(offset=offset, limit=limit)
-        return {Pascal}Page(total=total, items=items)  # SQLModel convierte a DTO
+        return {Pascal}Page(total=total, items=items)
 
     @router.post("", response_model={Pascal}Read)
     def create_{domain}(payload: {Pascal}Create, svc: {Pascal}Service = Depends(get_service)):
@@ -149,9 +149,7 @@ import_stmt = f"from app.routers.{domain} import router as {domain}_router"
 include_stmt = f"app.include_router({domain}_router)"
 
 if import_stmt not in main_txt:
-    # inserta import al inicio tras otros imports
     lines = main_txt.splitlines()
-    # busca la última línea de import para insertar después
     last_import_idx = 0
     for i, l in enumerate(lines):
         if l.startswith("from ") or l.startswith("import "):
@@ -160,7 +158,6 @@ if import_stmt not in main_txt:
     main_txt = "\n".join(lines)
 
 if include_stmt not in main_txt:
-    # si ya hay un FastAPI app, intenta insertar después del último include_router
     if "app = FastAPI" in main_txt and "include_router" in main_txt:
         lines = main_txt.splitlines()
         idxs = [i for i, l in enumerate(lines) if "include_router" in l]
@@ -168,7 +165,6 @@ if include_stmt not in main_txt:
         lines.insert(insert_at, include_stmt)
         main_txt = "\n".join(lines) + "\n"
     else:
-        # sino, lo añade al final
         main_txt += ("\n" + include_stmt + "\n")
 
 main_file.write_text(main_txt, encoding="utf-8")
