@@ -23,3 +23,6 @@ class EventBatchIn(SQLModel):
 class EventPage(SQLModel):
     total: int
     items: List[EventOut]
+
+class AnalysisIn(SQLModel):
+    event_id: int

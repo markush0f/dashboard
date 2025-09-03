@@ -28,3 +28,7 @@ def create_event(payload: EventIn, svc: EventService = Depends(get_event_service
 def create_events_batch(batch: EventBatchIn, svc: EventService = Depends(get_event_service)):
     inserted = svc.create_batch(batch.items)
     return {"inserted": inserted}
+
+@router.post("/analysis")
+def analyze_events(svc: EventService = Depends(get_event_service)):
+    return svc.analyze_events()
