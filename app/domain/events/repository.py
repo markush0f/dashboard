@@ -1,10 +1,11 @@
-from typing import Iterable
+from datetime import datetime
+from typing import Iterable, List, Optional
 from sqlmodel import Session, select
 from sqlalchemy import func, select as sa_select
 from .models import Event
 from typing import Any, Sequence, cast
 from sqlalchemy import desc
-# Event Repository
+
 class EventRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
@@ -36,3 +37,17 @@ class EventRepository:
         total = self.session.exec(stmt).one()   
         return int(total)
 
+    def list_for_analysis(
+        self,
+        user_id: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> List[Event]:
+        stmt = select(Event)
+        if user_id is not None:
+            stmt = stmt.where(Event.user_id == user_id)
+        if start:
+            stmt = stmt.where(Event.ts >= start)
+        if end:
+            stmt = stmt.where(Event.ts <= end)
+        return list(self.session.exec(stmt))

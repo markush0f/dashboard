@@ -1,8 +1,11 @@
 from asyncio import events
-from typing import Iterable, List
+from typing import Dict, Any, Optional, Iterable
 from sqlmodel import Session
+
+from app.domain.events import ai_service
 from .models import Event
 from .schemas import EventIn
+from datetime import datetime
 
 
 class EventService:
@@ -30,3 +33,26 @@ class EventService:
         items = list(repo.list(offset=offset, limit=limit))
         total = repo.count()
         return items, total
+
+    def analyze_events(
+        self,
+        user_id: Optional[int] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        from .repository import EventRepository
+
+        repo = EventRepository(self.session)
+        
+        events = repo.list_for_analysis(user_id=user_id, start=start, end=end)
+        if not events:
+            return {"detail": "No events to analyze"}
+
+        # ✅ Convertimos Event (ORM) -> EventIn (schema)
+        dto_events = [EventIn.model_validate(e) for e in events]
+
+        # Paso 1: resumen
+        summary = ai_service.summarize(dto_events)
+
+        # Paso 2: análisis IA
+        return ai_service.analyze_with_openai(summary)

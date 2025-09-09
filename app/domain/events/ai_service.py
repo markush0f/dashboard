@@ -1,4 +1,3 @@
-# app/domain/events/ai_service.py
 from typing import List, Dict, Any
 from app.domain.events.schemas import EventIn
 from .analytics import summarizer as _summarize

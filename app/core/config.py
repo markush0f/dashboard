@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     )
     DATABASE_URL: str
     OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
 
 @lru_cache
 def get_settings() -> Settings:

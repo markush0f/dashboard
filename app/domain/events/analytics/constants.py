@@ -1,5 +1,3 @@
-from app.infra.ai.openai_client import MODEL
-
 STRUCTURED_SCHEMA = {
     "type": "object",
     "properties": {

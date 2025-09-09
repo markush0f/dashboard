@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime
+from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 from app.core.db import get_session
 from app.domain.events.service import EventService
-from app.domain.events.schemas import EventIn, EventOut, EventBatchIn, EventPage
+from app.domain.events.schemas import AnalyzeResponse, EventIn, EventOut, EventBatchIn, EventPage
 from fastapi import HTTPException
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -20,6 +21,7 @@ def list_events(
     if total == 0:
         raise HTTPException(status_code=404, detail="No events found")
     return EventPage(total=total, items=items)  # type: ignore
+
 @router.post("", response_model=EventOut)
 def create_event(payload: EventIn, svc: EventService = Depends(get_event_service)):
     return svc.create(payload)
@@ -29,6 +31,14 @@ def create_events_batch(batch: EventBatchIn, svc: EventService = Depends(get_eve
     inserted = svc.create_batch(batch.items)
     return {"inserted": inserted}
 
-@router.post("/analysis")
-def analyze_events(svc: EventService = Depends(get_event_service)):
-    return svc.analyze_events()
+@router.post("/analysis", response_model=AnalyzeResponse)
+def analyze_events(
+    user_id: int | None = Query(None, description="Filtrar por user_id"),
+    start: datetime | None = Query(None, description="Fecha inicio"),
+    end: datetime | None = Query(None, description="Fecha fin"),
+    svc: EventService = Depends(get_event_service),
+):
+    result = svc.analyze_events(user_id=user_id, start=start, end=end)
+    if "detail" in result:
+        raise HTTPException(status_code=404, detail=result["detail"])
+    return result
