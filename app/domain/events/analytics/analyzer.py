@@ -2,24 +2,18 @@ import json
 from typing import Dict, Any
 from app.infra.ai.openai_client import get_openai
 from .constants import STRUCTURED_SCHEMA, PROMPT
-
 from app.core.config import get_settings
 
 MODEL = get_settings().OPENAI_MODEL
 
-
 def analyze_with_openai(summary: Dict[str, Any]) -> Dict[str, Any]:
     client = get_openai()
-    resp = client.responses.create(
+
+    resp = client.chat.completions.create(
         model=MODEL,
-        input=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "input_text", "text": PROMPT},
-                    {"type": "input_json", "input_json": {"summary": summary}},
-                ],
-            }
+        messages=[
+            {"role": "system", "content": "Eres analista de datos y devuelves SOLO JSON."},
+            {"role": "user", "content": f"{PROMPT}\n\n{json.dumps({'summary': summary}, ensure_ascii=False)}"},
         ],
         response_format={
             "type": "json_schema",
@@ -30,13 +24,12 @@ def analyze_with_openai(summary: Dict[str, Any]) -> Dict[str, Any]:
             },
         },
         temperature=0.1,
-    ) # type: ignore[call-arg]
+    )
 
-    # Formas seguras de extraer el texto (según SDK 1.40+):
-    # 1) Directo:
-    if hasattr(resp, "output_text") and resp.output_text:
-        return json.loads(resp.output_text)
+    message = resp.choices[0].message
+    content = message.content
 
-    # 2) Fallback por contenido (por si cambia el SDK):
-    content = resp.output[0].content[0].text  # type: ignore[attr-defined]
+    if not content:
+        raise ValueError("El modelo no devolvió contenido en la respuesta")
+
     return json.loads(content)

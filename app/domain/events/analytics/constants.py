@@ -11,20 +11,35 @@ STRUCTURED_SCHEMA = {
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "properties": {"category": {"type": "string"}, "porcentaje": {"type": "number"}},
+                        "properties": {
+                            "category": {"type": "string"},
+                            "porcentaje": {"type": "number"}
+                        },
                         "required": ["category", "porcentaje"],
+                        "additionalProperties": False
                     },
                 },
                 "top_dominios": {
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "properties": {"domain": {"type": "string"}, "pct": {"type": "number"}},
+                        "properties": {
+                            "domain": {"type": "string"},
+                            "pct": {"type": "number"}
+                        },
                         "required": ["domain", "pct"],
+                        "additionalProperties": False
                     },
                 },
             },
-            "required": ["total_horas", "productividad_media", "dias", "foco_top_categorias", "top_dominios"],
+            "required": [
+                "total_horas",
+                "productividad_media",
+                "dias",
+                "foco_top_categorias",
+                "top_dominios"
+            ],
+            "additionalProperties": False
         },
         "anomalias": {
             "type": "array",
@@ -38,15 +53,37 @@ STRUCTURED_SCHEMA = {
                     "criterio": {"type": "string"},
                     "comentario": {"type": "string"},
                 },
-                "required": ["fecha", "metrica", "valor"],
+                "required": [
+                    "fecha",
+                    "metrica",
+                    "valor",
+                    "z",
+                    "criterio",
+                    "comentario"
+                ],
+                "additionalProperties": False
             },
         },
-        "patrones": {"type": "array", "items": {"type": "string"}},
-        "recomendaciones": {"type": "array", "items": {"type": "string"}},
+        "patrones": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "recomendaciones": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
         "explicacion_corta": {"type": "string"},
     },
-    "required": ["kpis", "recomendaciones", "explicacion_corta"],
+    "required": [
+        "kpis",
+        "anomalias",
+        "patrones",
+        "recomendaciones",
+        "explicacion_corta"
+    ],
+    "additionalProperties": False
 }
+
 
 PROMPT = """Analiza el uso del navegador del usuario y devuelve SOLO JSON válido ajustado al schema.
 Datos:

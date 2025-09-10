@@ -43,16 +43,14 @@ class EventService:
         from .repository import EventRepository
 
         repo = EventRepository(self.session)
-        
         events = repo.list_for_analysis(user_id=user_id, start=start, end=end)
         if not events:
             return {"detail": "No events to analyze"}
 
-        # ✅ Convertimos Event (ORM) -> EventIn (schema)
+        # Convertir ORM -> DTO
         dto_events = [EventIn.model_validate(e) for e in events]
 
-        # Paso 1: resumen
         summary = ai_service.summarize(dto_events)
+        analysis = ai_service.analyze_with_openai(summary)
 
-        # Paso 2: análisis IA
-        return ai_service.analyze_with_openai(summary)
+        return {"summary": summary, "analysis": analysis}

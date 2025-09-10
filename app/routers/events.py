@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 from app.core.db import get_session
 from app.domain.events.service import EventService
-from app.domain.events.schemas import AnalyzeResponse, EventIn, EventOut, EventBatchIn, EventPage
+from app.domain.events.schemas import AnalysisFullResponse, AnalyzeResponse, EventIn, EventOut, EventBatchIn, EventPage
 from fastapi import HTTPException
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -31,7 +31,7 @@ def create_events_batch(batch: EventBatchIn, svc: EventService = Depends(get_eve
     inserted = svc.create_batch(batch.items)
     return {"inserted": inserted}
 
-@router.post("/analysis", response_model=AnalyzeResponse)
+@router.post("/analysis", response_model=AnalysisFullResponse)
 def analyze_events(
     user_id: int | None = Query(None, description="Filtrar por user_id"),
     start: datetime | None = Query(None, description="Fecha inicio"),

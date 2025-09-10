@@ -45,3 +45,7 @@ class AnalyzeResponse(BaseModel):
     patrones: List[str] = Field(default_factory=list)
     recomendaciones: List[str] = Field(default_factory=list)
     explicacion_corta: str
+    
+class AnalysisFullResponse(BaseModel):
+    summary: Dict[str, Any]
+    analysis: Dict[str, Any]
