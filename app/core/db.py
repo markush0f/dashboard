@@ -3,7 +3,7 @@ from typing import Generator
 from sqlmodel import create_engine, Session
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://markus:1234@localhost:5432/dashboard_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(
     DATABASE_URL,  # type: ignore
     pool_pre_ping=True,

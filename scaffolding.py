@@ -1,6 +1,3 @@
-# create_domain.py
-# Scaffolding para arquitectura con main.py en la raíz y DB en app/core/db.py
-
 from pathlib import Path
 import re
 import sys
@@ -16,7 +13,6 @@ if not re.fullmatch(r"[a-z][a-z0-9_]*", domain):
 
 Pascal = "".join(p.capitalize() for p in domain.split("_"))
 
-# Rutas según tu árbol
 project_root = Path(".").resolve()
 app_dir = project_root / "app"
 domain_dir = app_dir / "domain" / domain

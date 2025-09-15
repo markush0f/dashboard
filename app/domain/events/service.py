@@ -33,6 +33,12 @@ class EventService:
         items = list(repo.list(offset=offset, limit=limit))
         total = repo.count()
         return items, total
+    
+    def list_for_user(self, user_id: int) -> list[Event]:
+        from .repository import EventRepository
+
+        repo = EventRepository(self.session)
+        return repo.list_for_user(user_id=user_id)
 
     def analyze_events(
         self,

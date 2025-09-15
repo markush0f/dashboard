@@ -51,3 +51,7 @@ class EventRepository:
         if end:
             stmt = stmt.where(Event.ts <= end)
         return list(self.session.exec(stmt))
+    
+    def list_for_user(self, user_id: int) -> List[Event]:
+        stmt = sa_select(Event).where(Event.user_id == user_id).order_by(desc(Event.ts))
+        return list(self.session.exec(stmt))
